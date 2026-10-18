@@ -39,29 +39,29 @@ footer{text-align:center;padding:0 16px 26px;color:#c8b9c0;font-size:.82rem}
 <body>
 <header>
   <!-- Opcional: coloque uma imagem horizontal chamada cabecalho.jpg na raiz do repositório. -->
-  <img id="headerImage" src="cabecalho.jpg" alt="Cabeçalho do site" hidden>
+  <img id="headerImage" src="cabecalho.png" alt="Cabeçalho do site" hidden>
   <div class="header-placeholder" id="headerPlaceholder">
-    <h1>ENHYPEN ✦ MAMA 2026</h1><p>Monte seu comprovante personalizado de votação</p>
+    <h1>ENHYPEN - MAMA 2026</h1><p>Monte seu comprovante personalizado de votação</p>
   </div>
 </header>
 <main>
   <section class="intro">
     <h2>Crie seu comprovante</h2>
-    <p>Escolha uma foto para encaixar no espaço retangular da moldura e baixe sua imagem pronta.</p>
+    <p>Envie seu certificado de votação do Mnet Plus e poste no X com as hashtags oficiais: #ENHYPEN e #2026MAMAVOTE</p>
   </section>
   <div class="columns">
     <section class="card">
-      <h3>1. Envie sua foto</h3>
+      <h3>1. Envie seu certificado</h3>
       <div class="upload">
         <div style="font-size:2rem" aria-hidden="true">📷</div>
-        <p>Selecione uma imagem do seu celular ou computador.</p>
-        <label for="photoInput">Selecionar foto</label>
+        <p>Selecione a captura completa do certificado Mnet Plus (sem cortes).</p>
+        <label for="photoInput">Selecionar certificado</label>
         <input id="photoInput" type="file" accept="image/*">
       </div>
       <div class="actions">
-        <button class="button" id="resetButton" type="button" disabled>Remover foto</button>
+        <button class="button" id="resetButton" type="button" disabled>Remover certificado</button>
       </div>
-      <p class="help">A foto será ajustada automaticamente ao retângulo da moldura. A montagem acontece neste navegador; sua foto não é enviada para um servidor.</p>
+      <p class="help">O certificado será posicionado automaticamente atrás da moldura. A montagem acontece neste navegador: sua foto não é enviada para um servidor.</p>
       <div class="status" id="status" role="status" aria-live="polite">Carregando a moldura…</div>
     </section>
     <section class="card">
@@ -70,16 +70,17 @@ footer{text-align:center;padding:0 16px 26px;color:#c8b9c0;font-size:.82rem}
       <div class="actions">
         <button class="button primary" id="downloadButton" type="button" disabled>Baixar imagem PNG</button>
       </div>
-      <p class="help">A foto aparecerá no retângulo central inferior, abaixo do logotipo e acima do comprovante de votação.</p>
+      <p class="help">Baixe seu certificado com a moldura Engenes com LULA.</p>
     </section>
   </div>
 </main>
-<footer>Feito com carinho para ENGENEs · As fotos permanecem no dispositivo.</footer>
+<footer>Feito com carinho para ENGENEs.<br> As fotos permanecem no dispositivo.<br>Fan-made, não afiliado com a BELIFT LAB ou HYBE.</footer>
 <script>
 const FRAME_URL = "moldura.png";
-const PHOTO_AREA = { x: 0.205, y: 0.522, width: 0.590, height: 0.222 };
-// Se quiser mudar a posição/tamanho da janela da foto, ajuste os quatro valores acima.
-// Os valores são proporções do tamanho total da moldura, entre 0 e 1.
+// Posição calibrada para o certificado Mnet Plus de 852 × 1292.
+// O certificado inteiro é reduzido proporcionalmente; a foto direita
+// coincide com o quadrado vermelho da moldura.
+const CERTIFICATE = { x: 93.35, y: 295.46, width: 877.78, height: 1331.60 };
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 const input = document.getElementById("photoInput");
@@ -101,35 +102,27 @@ function loadImage(src) {
     img.src = src;
   });
 }
-function drawCover(img, x, y, w, h) {
-  const scale = Math.max(w / img.naturalWidth, h / img.naturalHeight);
-  const sw = w / scale, sh = h / scale;
-  const sx = (img.naturalWidth - sw) / 2, sy = (img.naturalHeight - sh) / 2;
-  ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
-}
 function render() {
   if (!frame) return;
   canvas.width = frame.naturalWidth;
   canvas.height = frame.naturalHeight;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  // Desenha a foto apenas dentro da janela retangular.
-  const a = PHOTO_AREA;
-  const x = Math.round(a.x * canvas.width), y = Math.round(a.y * canvas.height);
-  const w = Math.round(a.width * canvas.width), h = Math.round(a.height * canvas.height);
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
   if (photo) {
-    ctx.save();
-    ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
-    drawCover(photo, x, y, w, h);
-    ctx.restore();
+    const a = CERTIFICATE;
+    // Ajuste proporcional, sem esticar o certificado.
+    const scale = Math.min(a.width / photo.naturalWidth, a.height / photo.naturalHeight);
+    const w = photo.naturalWidth * scale;
+    const h = photo.naturalHeight * scale;
+    ctx.drawImage(photo, a.x + (a.width-w)/2, a.y + (a.height-h)/2, w, h);
+
   } else {
-    ctx.fillStyle = "#f4e9ed";
-    ctx.fillRect(x, y, w, h);
-    ctx.fillStyle = "#5d4149";
-    ctx.textAlign = "center"; ctx.textBaseline = "middle";
-    ctx.font = `bold ${Math.max(18, canvas.width * .022)}px Arial`;
-    ctx.fillText("SUA FOTO AQUI", x + w/2, y + h/2);
+    ctx.fillStyle = "#bfb7c2";
+    ctx.font = "bold 26px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("ENVIE SEU CERTIFICADO MNET PLUS", canvas.width / 2, 1070);
   }
-  // A arte fica por cima da foto para preservar os elementos decorativos.
   ctx.drawImage(frame, 0, 0, canvas.width, canvas.height);
   download.disabled = !photo;
 }
@@ -142,7 +135,7 @@ input.addEventListener("change", async e => {
     photoUrl = URL.createObjectURL(file);
     photo = await loadImage(photoUrl);
     reset.disabled = false;
-    status.textContent = "Foto carregada. Confira a prévia!";
+    status.textContent = "Certificado carregado. Confira a prévia!";
     render();
   } catch {
     status.textContent = "Não foi possível abrir a imagem. Tente outro arquivo.";
@@ -152,7 +145,7 @@ reset.addEventListener("click", () => {
   photo = null; input.value = "";
   if (photoUrl) URL.revokeObjectURL(photoUrl);
   photoUrl = null; reset.disabled = true;
-  status.textContent = "Foto removida.";
+  status.textContent = "Certificado removido.";
   render();
 });
 download.addEventListener("click", () => {
@@ -171,7 +164,7 @@ download.addEventListener("click", () => {
   try {
     frame = await loadImage(FRAME_URL);
     canvas.width = frame.naturalWidth; canvas.height = frame.naturalHeight;
-    status.textContent = "Moldura carregada. Envie sua foto.";
+    status.textContent = "Moldura carregada. Envie seu certificado.";
     render();
   } catch {
     status.textContent = 'Não foi possível carregar moldura.png. Confira se ela está na raiz do repositório.';
